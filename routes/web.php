@@ -17,6 +17,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+//auth route for both
+Route::group(['middleware' => ['auth']], function() {
+    Route::get('/dashboard', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
+});
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// for users
+Route::group(['middleware' => ['auth', 'role:user']], function() {
+    Route::get('/dashboard/profile', 'App\Http\Controllers\DashboardController@profile')->name('dashboard.profile');
+});
+
+// for librarians
+Route::group(['middleware' => ['auth', 'role:librarian']], function() {
+    Route::get('/dashboard/postcreate', 'App\Http\Controllers\DashboardController@postcreate')->name('dashboard.postcreate');
+});
+
+
+require __DIR__.'/auth.php';
